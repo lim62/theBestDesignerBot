@@ -6,5 +6,4 @@ class AdminMainSG(StatesGroup):
     database = State()
     mailing = State()
     clean_contacts = State()
-    clean_database = State()
     sure_to_mail = State()
