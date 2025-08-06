@@ -1,0 +1,1 @@
+from bot.middlewares.i18n_middleware import TranslatorRunnerMiddleware
