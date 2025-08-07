@@ -1,4 +1,4 @@
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, PostgresDsn
 from environs import Env
 
 class BotConfig(BaseModel):
@@ -10,7 +10,7 @@ class LoggingConfig(BaseModel):
     FORMAT: str
 
 class DatabaseCongig(BaseModel):
-    DSN: str
+    DSN: PostgresDsn
 
 class RedisConfig(BaseModel):
     HOST: str

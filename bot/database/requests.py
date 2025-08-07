@@ -1,7 +1,56 @@
 from sqlalchemy import update, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
+from bot.database.models.admins import Admin
 from bot.database.models.users import User
+
+async def insert_admin(
+    session: AsyncSession,
+    telegram_id: int,
+    mailing_text: str,
+    photo: str
+) -> None:
+    stmt = insert(Admin).values(
+        dict(
+            telegram_id=telegram_id,
+            mailing_text=mailing_text,
+            photo=photo
+        )
+    )
+    stmt = stmt.on_conflict_do_update(
+        index_elements=['telegram_id'],
+        set_=dict(
+            mailing_text=mailing_text,
+            photo=photo
+        )
+    )
+    await session.execute(stmt)
+    await session.commit()
+
+async def insert_text(
+    session: AsyncSession,
+    telegram_id: int,
+    mailing_text: str
+) -> None:
+    stmt = update(Admin).where(Admin.telegram_id == telegram_id).values(dict(mailing_text=mailing_text))
+    await session.execute(stmt)
+    await session.commit()
+
+async def insert_photo(
+    session: AsyncSession,
+    telegram_id: int,
+    photo: str
+) -> None:
+    stmt = update(Admin).where(Admin.telegram_id == telegram_id).values(dict(photo=photo))
+    await session.execute(stmt)
+    await session.commit()
+
+async def select_admin(
+    session: AsyncSession
+) -> dict:
+    stmt = select(Admin)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 async def insert_user(
     session: AsyncSession,

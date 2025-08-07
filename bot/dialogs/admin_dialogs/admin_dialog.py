@@ -1,16 +1,21 @@
+from aiogram.types import ContentType
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Format
 from aiogram_dialog.widgets.kbd import Row, SwitchTo
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput
 from bot.states import AdminMainSG
-from bot.dialogs.admin_dialogs.admin_handlers import mailing_handler, delete_handler
+from bot.dialogs.admin_dialogs.admin_handlers import (mailing_text_handler,
+                                                      mailing_photo_handler,
+                                                      progress_mailing,
+                                                      delete_handler)
 from bot.dialogs.admin_dialogs.admin_getters import (menu_getter,
                                                      contacts_getter,
                                                      database_getter,
-                                                     mailing_getter,
+                                                     mailing_text_getter,
+                                                     mailing_photo_getter,
                                                      clean_contacts_getter,
                                                      sure_to_mail_getter)
-# add no_database text!!!!!!!!
+
 admin_main_dialog = Dialog(
     Window(
         Format('{text}'),
@@ -19,7 +24,7 @@ admin_main_dialog = Dialog(
             SwitchTo(text=Format('{database_text}'), id='change_database', state=AdminMainSG.database)
         ),
         Row(
-            SwitchTo(text=Format('{mailing_text}'), id='change_mailing', state=AdminMainSG.mailing)
+            SwitchTo(text=Format('{mailing_text}'), id='change_mailing', state=AdminMainSG.mailing_text)
         ),
         getter=menu_getter,
         state=AdminMainSG.menu
@@ -43,14 +48,27 @@ admin_main_dialog = Dialog(
     ),
     Window(
         Format('{text}'),
-        MessageInput(
-            func=mailing_handler
+        TextInput(
+            id='mailing_text',
+            on_success=mailing_text_handler
         ),
         Row(
             SwitchTo(text=Format('{cancel_text}'), id='cancel_mailing', state=AdminMainSG.menu)
         ),
-        getter=mailing_getter,
-        state=AdminMainSG.mailing
+        getter=mailing_text_getter,
+        state=AdminMainSG.mailing_text
+    ),
+    Window(
+        Format('{text}'),
+        MessageInput(
+            content_types=ContentType.PHOTO,
+            func=mailing_photo_handler
+        ),
+        Row(
+            SwitchTo(text=Format('{cancel_text}'), id='cancel_mailing', state=AdminMainSG.menu)
+        ),
+        getter=mailing_photo_getter,
+        state=AdminMainSG.mailing_photo
     ),
     Window(
         Format('{text}'),
@@ -65,7 +83,7 @@ admin_main_dialog = Dialog(
         Format('{text}'),
         Row(
             SwitchTo(text=Format('{cancel_text}'), id='cancel_doing_mailing', state=AdminMainSG.menu),
-            SwitchTo(text=Format('{progress_text}'), id='progress_mailing', state=AdminMainSG.menu, on_click=None)
+            SwitchTo(text=Format('{progress_text}'), id='progress_mailing', state=AdminMainSG.menu, on_click=progress_mailing)
         ),
         getter=sure_to_mail_getter,
         state=AdminMainSG.sure_to_mail

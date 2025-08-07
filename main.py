@@ -1,6 +1,6 @@
 import asyncio
-import logging
 import sys
+#import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
@@ -24,24 +24,23 @@ async def main() -> None:
         token=config.bot.TOKEN.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
-    logging.basicConfig(
-        level=config.log.LEVEL,
-        format=config.log.FORMAT,
-        style='{'
-    )
+    #logging.basicConfig(
+    #    level=config.log.LEVEL,
+    #    format=config.log.FORMAT,
+    #    style='{'
+    #)
     engine: AsyncEngine = create_async_engine(
         url=str(config.database.DSN),
         echo=False
     )
     async with engine.begin() as connection:
-        #await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
     session: AsyncSession = async_sessionmaker(engine, expire_on_commit=False)
     dp = Dispatcher(storage=load_storage(config), _translator_hub=translator_hub)
     dp.include_routers(admin_router, user_router)
     dp.include_routers(admin_main_dialog, user_main_dialog)
     setup_dialogs(dp)
-    dp.update.middleware(SessionMiddleware(session))
+    dp.update.middleware(SessionMiddleware(session, bot))
     dp.update.middleware(TranslatorRunnerMiddleware())
     admin_router.message.filter(AdminFilter(config))
     await bot.delete_webhook(drop_pending_updates=True)

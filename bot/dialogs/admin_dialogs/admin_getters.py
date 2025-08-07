@@ -60,10 +60,17 @@ async def database_getter(dialog_manager: DialogManager, **kwargs) -> dict:
         'cancel_text': i18n.button.cancel()
     }
 
-async def mailing_getter(dialog_manager: DialogManager, **kwargs) -> dict:
+async def mailing_text_getter(dialog_manager: DialogManager, **kwargs) -> dict:
     i18n: TranslatorRunner = dialog_manager.middleware_data.get('i18n')
     return {
-        'text': i18n.admin.mailing(),
+        'text': i18n.admin.mailing.text(),
+        'cancel_text': i18n.button.cancel()
+    }
+
+async def mailing_photo_getter(dialog_manager: DialogManager, **kwargs) -> dict:
+    i18n: TranslatorRunner = dialog_manager.middleware_data.get('i18n')
+    return {
+        'text': i18n.admin.mailing.photo(),
         'cancel_text': i18n.button.cancel()
     }
 
